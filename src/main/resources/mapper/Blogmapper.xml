@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="my.lxh.blog.mapper.BlogMapper">
+
+    <resultMap id="blogMap" type="my.lxh.blog.entity.Blog">
+        <id column="bid" property="id"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="description" property="description"/>
+        <result column="first_picture" property="firstPicture"/>
+        <result column="flag" property="flag"/>
+        <result column="views" property="views"/>
+        <result column="appreciation" property="appreciation"/>
+        <result column="share_statement" property="shareStatement"/>
+        <result column="commentable" property="commentable"/>
+        <result column="published" property="published"/>
+        <result column="recommend" property="recommend"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <association property="type" javaType="my.lxh.blog.entity.Type">
+            <id column="tid" property="id"/>
+            <result column="tname" property="name"/>
+        </association>
+        <!-- 后面还有其他字段映射 -->
+        <association property="user" javaType="my.lxh.blog.entity.User">
+            <id column="uid" property="id"/>
+            <result column="nickname" property="nickname"/>
+            <result column="avatar" property="avatar"/>
+        </association>
+        <collection property="tags" ofType="my.lxh.blog.entity.Tag">
+            <id column="tag_id" property="id"/>
+            <result column="tag_name" property="name"/>
+        </collection>
+    </resultMap>
+
+    <insert id="insertBlog" parameterType="my.lxh.blog.entity.Blog" useGeneratedKeys="true" keyProperty="id">
+        insert into t_blog(title, content, description,
+                           first_picture, flag, views,
+                           appreciation, share_statement, commentable,
+                           published, recommend, create_time,
+                           update_time, type_id, user_id)
+                           VALUE (#{title},#{content},#{description},
+                                  #{firstPicture},#{flag},#{views},
+                                 #{appreciation},#{shareStatement},#{commentable},
+                                 #{published},#{recommend},#{createTime},
+                                 #{updateTime},#{typeId},#{userId})
+    </insert>
+
+    <select id="getBlogsViewByTypeOrNull" resultMap="blogMap" parameterType="integer">
+        select b.id bid,title,first_picture,description,views,b.update_time,type_id,t.id tid,t.name
+        tname,tu.nickname,tu.avatar
+        from t_blog b
+        left join t_type t
+        on b.type_id=t.id
+        left join t_user tu
+        on b.user_id = tu.id
+        where b.published=true
+        <if test="tid!=null">
+            and t.id=#{tid}
+        </if>
+        order by b.update_time desc
+    </select>
+
+    <select id="getBlogsViewByTagId" resultMap="blogMap" parameterType="integer">
+        select b.id    bid,
+               title,
+               first_picture,
+               description,
+               views,
+               b.update_time,
+               type_id,
+               t.id    tid,
+               t.name  tname,
+               tu.nickname,
+               tu.avatar,
+               tt.id   tag_id,
+               tt.name tag_name
+        from t_blog b
+                 left join t_type t
+                           on b.type_id = t.id
+                 left join t_user tu
+                           on b.user_id = tu.id
+                 left join t_blog_tags tbt
+                           on b.id = tbt.blog_id
+                 left join t_tag tt
+                           on tbt.tag_id = tt.id
+        where tt.id = #{tid}
+          and b.published = true
+        order by b.create_time desc
+    </select>
+
+    <select id="archiveByYear" resultMap="blogMap" parameterType="integer">
+        select id bid, title, flag, create_time
+        from t_blog b
+        where published = true
+          and date_format(b.create_time, '%Y') = #{year}
+        order by create_time desc
+    </select>
+
+    <select id="getYears" resultType="integer">
+        select date_format(create_time, '%Y') year
+        from t_blog
+        group by year
+    </select>
+
+    <select id="getBlogsViewByKeyword" resultMap="blogMap" parameterType="string">
+        select b.id   bid,
+               title,
+               first_picture,
+               description,
+               views,
+               b.update_time,
+               type_id,
+               t.id   tid,
+               tu.avatar,
+               t.name tname,
+               tu.nickname
+        from t_blog b
+                 left join t_type t
+                           on b.type_id = t.id
+                 left join t_user tu
+                           on b.user_id = tu.id
+        where b.published = true and b.title like #{keyword}
+           or b.content like #{keyword}
+        order by b.create_time desc
+    </select>
+
+    <select id="getBlogDetail" resultMap="blogMap" parameterType="integer">
+        select b.id    bid,
+               title,
+               first_picture,
+               content,
+               views,
+               appreciation,
+               share_statement,
+               commentable,
+               b.update_time,
+               flag,
+               tu.nickname,
+               tu.avatar,
+               tt.id   tag_id,
+               tt.name tag_name
+        from t_blog b
+                 left join t_user tu
+                           on b.user_id = tu.id
+                 left join t_blog_tags tbt
+                           on b.id = tbt.blog_id
+                 left join t_tag tt
+                           on tbt.tag_id = tt.id
+        where b.id = #{id}
+          and b.published = true
+    </select>
+
+    <select id="selectAll" resultMap="blogMap">
+        select tb.id bid, tb.title, tb.update_time, tb.published, tt.name tname, tt.id tid
+        from t_blog tb
+                 left join t_type tt on tb.type_id = tt.id order by tb.update_time desc;
+    </select>
+
+
+</mapper>

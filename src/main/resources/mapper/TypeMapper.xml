@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="my.lxh.blog.mapper.TypeMapper">
+    <resultMap id="typeMap" type="my.lxh.blog.entity.Type">
+        <id column="tid" property="id"/>
+        <result column="tname" property="name"/>
+        <collection property="blogs" ofType="my.lxh.blog.entity.Blog">
+            <id column="bid" property="id"/>
+            <result column="title" property="title"/>
+            <result column="content" property="content"/>
+            <result column="description" property="description"/>
+            <result column="first_picture" property="firstPicture"/>
+            <result column="flag" property="flag"/>
+            <result column="views" property="views"/>
+            <result column="appreciation" property="appreciation"/>
+            <result column="share_statement" property="shareStatement"/>
+            <result column="commentable" property="commentable"/>
+            <result column="published" property="published"/>
+            <result column="recommend" property="recommend"/>
+            <result column="createTime" property="createTime"/>
+            <result column="updateTime" property="updateTime"/>
+        </collection>
+    </resultMap>
+
+    <insert id="insertType" parameterType="my.lxh.blog.entity.Type" useGeneratedKeys="true" keyProperty="id">
+        insert into t_type(name) VALUE (#{name})
+    </insert>
+
+    <select id="findTypeNum" resultMap="typeMap">
+        select b.id bid, t.id tid, t.name tname
+        from t_type t
+                 left join t_blog b
+                           on t.id = b.type_id
+        where published = true
+           or published is null
+    </select>
+
+</mapper>

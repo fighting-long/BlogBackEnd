@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="my.lxh.blog.mapper.TagMapper">
+    <resultMap id="tagMap" type="my.lxh.blog.entity.Tag">
+        <id column="tid" property="id"/>
+        <result column="tname" property="name"/>
+        <collection property="blogs" ofType="my.lxh.blog.entity.Blog">
+            <id column="bid" property="id"/>
+            <result column="title" property="title"/>
+            <result column="content" property="content"/>
+            <result column="description" property="description"/>
+            <result column="first_picture" property="firstPicture"/>
+            <result column="flag" property="flag"/>
+            <result column="views" property="views"/>
+            <result column="appreciation" property="appreciation"/>
+            <result column="share_statement" property="shareStatement"/>
+            <result column="commentable" property="commentable"/>
+            <result column="published" property="published"/>
+            <result column="recommend" property="recommend"/>
+            <result column="createTime" property="createTime"/>
+            <result column="updateTime" property="updateTime"/>
+        </collection>
+    </resultMap>
+
+    <insert id="insertTag" parameterType="my.lxh.blog.entity.Tag" useGeneratedKeys="true" keyProperty="id">
+        insert into t_tag(name) VALUE (#{name})
+    </insert>
+
+    <select id="findTagNum" resultMap="tagMap">
+        select t.id tid, t.name tname, bt.blog_id bid
+        from t_tag t
+                 left join t_blog_tags bt
+                           on t.id = bt.tag_id
+                 left join t_blog b
+                           on bt.blog_id = b.id
+        where b.published = true
+           or b.published IS NULL
+    </select>
+
+    <select id="getTagByBlogId" resultMap="tagMap" parameterType="long">
+        select tt.id tid, tt.name tname
+        from t_tag tt
+                 left join t_blog_tags tbt
+                           on tt.id = tbt.tag_id
+        where tbt.blog_id = #{id};
+    </select>
+
+</mapper>
