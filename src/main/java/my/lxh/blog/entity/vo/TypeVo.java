@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class TypeVo {
     @ApiModelProperty("主键")
-    private Long id;
+    private Integer id;
 
     @ApiModelProperty("类型名")
     private String name;

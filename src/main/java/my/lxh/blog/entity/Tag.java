@@ -24,7 +24,7 @@ public class Tag {
 
     @TableId
     @ApiModelProperty("主键")
-    private Long id;
+    private Integer id;
 
     @ApiModelProperty("标签名")
     private String name;

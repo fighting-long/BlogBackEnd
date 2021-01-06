@@ -28,7 +28,7 @@ public class Blog {
 
     @ApiModelProperty("主键")
     @TableId
-    private Long id;
+    private Integer id;
 
     @ApiModelProperty("标题")
     private String title;
@@ -70,7 +70,7 @@ public class Blog {
     private String description;
 
     @ApiModelProperty("博客类型id")
-    private Long typeId;
+    private Integer typeId;
 
     @ApiModelProperty("博客类型")
     @TableField(exist = false)

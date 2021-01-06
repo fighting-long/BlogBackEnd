@@ -26,7 +26,7 @@ public class User {
 
     @TableId
     @ApiModelProperty("主键")
-    private Long id;
+    private Integer id;
 
     @ApiModelProperty("昵称")
     private String nickname;

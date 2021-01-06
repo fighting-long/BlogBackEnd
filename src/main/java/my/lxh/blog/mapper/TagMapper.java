@@ -23,7 +23,7 @@ public interface TagMapper extends BaseMapper<Tag> {
      * @param id
      * @return
      */
-    List<Tag> getTagByBlogId(Long id);
+    List<Tag> getTagByBlogId(Integer id);
 
     /**
      * 保存标签

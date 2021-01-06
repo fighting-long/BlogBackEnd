@@ -39,7 +39,7 @@ public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> impleme
         user.setNickname(infoVo.getNickname())
                 .setAvatar(infoVo.getAvatar())
                 .setEmail(infoVo.getEmail())
-                .setId(1L);
+                .setId(1);
         userMapper.updateById(user);
         return true;
     }

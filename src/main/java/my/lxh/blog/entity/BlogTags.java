@@ -20,6 +20,6 @@ import lombok.experimental.Accessors;
 public class BlogTags {
     @TableId
     private Integer id;
-    private Long blogId;
-    private Long tagId;
+    private Integer blogId;
+    private Integer tagId;
 }

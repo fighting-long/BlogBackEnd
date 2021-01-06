@@ -107,7 +107,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         Blog blog = baseMapper.selectById(id);
         blog.setType(typeMapper.selectById(blog.getTypeId()));
         List<BlogTags> blogTags = blogTagsMapper.selectList(new QueryWrapper<BlogTags>().lambda().eq(BlogTags::getBlogId, id));
-        List<Long> temp= new ArrayList<>();
+        List<Integer> temp= new ArrayList<>();
         blogTags.forEach(blogTag -> temp.add(blogTag.getTagId()));
         List<Tag> tags = tagMapper.selectBatchIds(temp);
         List<String> list=new ArrayList<>();
@@ -127,11 +127,11 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         }
         //更新博客标签的中间表，先查询该博客下的所有标签id
         List<BlogTags> blogTags = blogTagsMapper.selectList(new QueryWrapper<BlogTags>().lambda().eq(BlogTags::getBlogId, blog.getId()));
-        List<Long> list = new ArrayList<>();
+        List<Integer> list = new ArrayList<>();
         blogTags.forEach(blogTag -> list.add(blogTag.getTagId()));
-        List<Long> copy=new ArrayList<>(list);
+        List<Integer> copy=new ArrayList<>(list);
         //找出该博客现在应该有的标签id
-        List<Long> tagIds=new ArrayList<>();
+        List<Integer> tagIds=new ArrayList<>();
         blog.getTags().forEach(tag -> tagIds.add(tag.getId()));
         //找出中间表应该删除的数据，即以前有的，现在没有的
         list.removeAll(tagIds);
