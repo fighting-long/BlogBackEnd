@@ -58,9 +58,10 @@ public class BackCommentController {
     @DeleteMapping("/deleteComment/{id}")
     @ApiOperation("删除一条评论")
     public ResultUtil<?> deleteComment(@PathVariable Long id){
-        commentService.remove(new QueryWrapper<Comment>()
-                .lambda()
-                .eq(Comment::getParentCommentId,id));
+        // 将所有属于这个评论的子评论的父id换为这个评论的父id，最后将这个评论删除
+        commentService.lambdaUpdate()
+                .set(Comment::getParentCommentId,commentService.getById(id).getParentCommentId())
+                .eq(Comment::getParentCommentId,id).update();
         return commentService.removeById(id)?ResultUtil.ok():ResultUtil.error();
     }
 
