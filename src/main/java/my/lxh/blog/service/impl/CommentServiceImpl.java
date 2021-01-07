@@ -5,8 +5,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import my.lxh.blog.entity.Comment;
 import my.lxh.blog.mapper.CommentsMapper;
 import my.lxh.blog.service.ICommentService;
+import my.lxh.blog.ws.CommentEndpoint;
 import org.springframework.stereotype.Service;
 
+import javax.websocket.EncodeException;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -22,7 +25,6 @@ public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> imp
     public List<Comment> getComments(Long id) {
         List<Comment> all = baseMapper.selectList(new QueryWrapper<Comment>()
                 .eq("blog_id", id)
-//                .eq("deleted", false)
                 .orderByDesc("admin")
                 .orderByDesc("create_time"));
         List<Comment> parent = new ArrayList<>();
@@ -51,7 +53,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> imp
     private void mergeComment(List<Comment> child,Comment comment){
         List<Comment> temp =new ArrayList<>();
         for(Comment c : child){
-            if(comment.getId().equals(c.getParentCommentId())){
+            if(comment.getId().compareTo(c.getParentCommentId())==0){
                 try {
                     c.setParentComment((Comment)comment.clone());
                 } catch (CloneNotSupportedException e) {
@@ -85,7 +87,12 @@ public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> imp
                                 .setChecked(true)
                                 .setNickname("博主");
         }
-        return this.save(comment);
+        boolean save = this.save(comment);
+        //评论成功并且不是博主 才向前端发送数据
+        if(save && Objects.isNull(comment.getAdmin())){
+            notifyFront();
+        }
+        return save;
     }
 
     @Override
@@ -105,4 +112,13 @@ public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> imp
         return this.save(comment);
     }
 
+    private void notifyFront(){
+        CommentEndpoint.sessions.forEach(session -> {
+            try {
+                session.getBasicRemote().sendObject(true);
+            } catch (IOException | EncodeException e) {
+                e.printStackTrace();
+            }
+        });
+    }
 }

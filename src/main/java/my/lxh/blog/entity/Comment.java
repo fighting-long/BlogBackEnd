@@ -53,14 +53,14 @@ public class Comment implements Cloneable{
     private Blog blog;
 
     @ApiModelProperty("所属博客id")
-    private Long blogId;
+    private Integer blogId;
 
     @ApiModelProperty("子评论")
     @TableField(exist = false)
     private List<Comment> replyComments;
 
     @ApiModelProperty("父评论id")
-    private Long parentCommentId;
+    private Integer parentCommentId;
 
     @ApiModelProperty("父评论")
     @TableField(exist = false)

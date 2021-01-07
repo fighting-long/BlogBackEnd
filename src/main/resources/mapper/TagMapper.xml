@@ -39,7 +39,7 @@
            or b.published IS NULL
     </select>
 
-    <select id="getTagByBlogId" resultMap="tagMap" parameterType="long">
+    <select id="getTagByBlogId" resultMap="tagMap" parameterType="integer">
         select tt.id tid, tt.name tname
         from t_tag tt
                  left join t_blog_tags tbt

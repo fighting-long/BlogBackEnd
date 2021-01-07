@@ -6,8 +6,12 @@ import io.swagger.annotations.ApiOperation;
 import my.lxh.blog.entity.Comment;
 import my.lxh.blog.service.ICommentService;
 import my.lxh.blog.utils.ResultUtil;
+import my.lxh.blog.ws.CommentEndpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.websocket.EncodeException;
+import java.io.IOException;
 
 /**
  * @author lxh
@@ -38,21 +42,30 @@ public class BackCommentController {
     @GetMapping("/checkedComment/{id}")
     @ApiOperation("读一条评论")
     public ResultUtil<?> checkComment(@PathVariable Long id){
-        return commentService.lambdaUpdate()
-                .set(Comment::getChecked,true)
-                .eq(Comment::getId,id)
-                .eq(Comment::getChecked,false)
-                .update()?ResultUtil.ok():ResultUtil.failure("无需已读！");
+        boolean update = commentService.lambdaUpdate()
+                .set(Comment::getChecked, true)
+                .eq(Comment::getId, id)
+                .eq(Comment::getChecked, false)
+                .update();
+        if(update){
+            //阅读成功才向前端发送数据
+            notifyFront();
+        }
+        return update?ResultUtil.ok():ResultUtil.failure("无需已读！");
     }
 
     @GetMapping("/checkedComments")
     @ApiOperation("读全部评论")
     public ResultUtil<?> checkComments(){
-        System.out.println("执行了");
-        return commentService.lambdaUpdate()
-                .set(Comment::getChecked,true)
-                .eq(Comment::getChecked,false)
-                .update()?ResultUtil.ok():ResultUtil.failure("暂无评论需要已读！");
+        boolean update = commentService.lambdaUpdate()
+                .set(Comment::getChecked, true)
+                .eq(Comment::getChecked, false)
+                .update();
+        if(update){
+            //阅读成功才向前端发送数据
+            notifyFront();
+        }
+        return update?ResultUtil.ok():ResultUtil.failure("暂无评论需要已读！");
     }
 
     @DeleteMapping("/deleteComment/{id}")
@@ -62,7 +75,12 @@ public class BackCommentController {
         commentService.lambdaUpdate()
                 .set(Comment::getParentCommentId,commentService.getById(id).getParentCommentId())
                 .eq(Comment::getParentCommentId,id).update();
-        return commentService.removeById(id)?ResultUtil.ok():ResultUtil.error();
+        boolean b = commentService.removeById(id);
+        if(b){
+            // 删除成功才向前端发送数据
+            notifyFront();
+        }
+        return b?ResultUtil.ok():ResultUtil.error();
     }
 
     @PostMapping("/replyByAdmin")
@@ -71,5 +89,14 @@ public class BackCommentController {
         return commentService.saveCommentByAdmin(comment)?ResultUtil.ok():ResultUtil.error();
     }
 
+    private void notifyFront(){
+        CommentEndpoint.sessions.forEach(session -> {
+            try {
+                session.getBasicRemote().sendObject(true);
+            } catch (IOException | EncodeException e) {
+                e.printStackTrace();
+            }
+        });
+    }
 
 }
