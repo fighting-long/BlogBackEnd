@@ -17,6 +17,7 @@ import my.lxh.blog.service.IBlogService;
 import my.lxh.blog.utils.MarkdownUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -68,6 +69,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
     }
 
     @Override
+    @Transactional
     public Blog getBlogDetailById(Integer id) {
         Blog blog = baseMapper.getBlogDetail(id);
         blog.setViews(blog.getViews()+1);

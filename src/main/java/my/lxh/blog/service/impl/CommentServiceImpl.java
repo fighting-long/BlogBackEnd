@@ -7,6 +7,7 @@ import my.lxh.blog.mapper.CommentsMapper;
 import my.lxh.blog.service.ICommentService;
 import my.lxh.blog.ws.CommentEndpoint;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.websocket.EncodeException;
 import java.io.IOException;
@@ -19,7 +20,7 @@ import java.util.*;
 @Service
 public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> implements ICommentService {
 
-    private final List<Comment> comments =new ArrayList<>();
+    private final List<Comment> comments = new ArrayList<>();
 
     @Override
     public List<Comment> getComments(Long id) {
@@ -29,16 +30,16 @@ public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> imp
                 .orderByDesc("create_time"));
         List<Comment> parent = new ArrayList<>();
         List<Comment> child = new ArrayList<>();
-        all.forEach(comment ->{
-            if(Objects.isNull(comment.getParentCommentId())){
+        all.forEach(comment -> {
+            if (Objects.isNull(comment.getParentCommentId())) {
                 parent.add(comment);
-            }else {
+            } else {
                 child.add(comment);
             }
         });
         // 对评论进行合并
-        for (Comment c : parent){
-            mergeComment(child,c);
+        for (Comment c : parent) {
+            mergeComment(child, c);
             c.setReplyComments(new ArrayList<>(this.comments));
             this.comments.clear();
         }
@@ -47,49 +48,50 @@ public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> imp
 
     /**
      * 对每级评论进行合并
+     *
      * @param child
      * @param comment
      */
-    private void mergeComment(List<Comment> child,Comment comment){
-        List<Comment> temp =new ArrayList<>();
-        for(Comment c : child){
-            if(comment.getId().compareTo(c.getParentCommentId())==0){
+    private void mergeComment(List<Comment> child, Comment comment) {
+        List<Comment> temp = new ArrayList<>();
+        for (Comment c : child) {
+            if (comment.getId().compareTo(c.getParentCommentId()) == 0) {
                 try {
-                    c.setParentComment((Comment)comment.clone());
+                    c.setParentComment((Comment) comment.clone());
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                 }
                 temp.add(c);
             }
         }
-        if(temp.size()==0){
+        if (temp.size() == 0) {
             return;
         }
-        for (Comment c : temp){
-            mergeComment(child,c);
+        for (Comment c : temp) {
+            mergeComment(child, c);
         }
         comments.addAll(temp);
     }
 
     @Override
+    @Transactional
     public boolean saveComment(Comment comment) {
         // 设置一些默认值
         comment.setCreateTime(new Date())
                 .setChecked(false)
                 // 随机分配，和博主头像不一样  == 1~4 ==
-                .setAvatar("http://studywithu.cn/static/images/avatar/liuli_"+(new Random().nextInt(4)+1)+".jpg");
-
+                .setAvatar("http://studywithu.cn/static/images/avatar/liuli_" + (new Random().nextInt(4) + 1) + ".jpg");
         // 判断博主 ， 设置一些默认值
         String content = comment.getContent();
-        if (content.startsWith("<lxh>") && content.endsWith("</lxh>")){
-            comment.setContent(content.substring(5,content.length()-6))
-                                .setAdmin(true)
-                                .setChecked(true)
-                                .setNickname("博主");
+        if (content.startsWith("<lxh>") && content.endsWith("</lxh>")) {
+            comment.setContent(content.substring(5, content.length() - 6))
+                    .setAdmin(true)
+                    .setChecked(true)
+                    .setNickname("博主");
         }
         boolean save = this.save(comment);
         //评论成功并且不是博主 才向前端发送数据
-        if(save && Objects.isNull(comment.getAdmin())){
+        if (save && Objects.isNull(comment.getAdmin())) {
             notifyFront();
         }
         return save;
@@ -112,7 +114,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> imp
         return this.save(comment);
     }
 
-    private void notifyFront(){
+    private void notifyFront() {
         CommentEndpoint.sessions.forEach(session -> {
             try {
                 session.getBasicRemote().sendObject(true);
