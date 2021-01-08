@@ -104,6 +104,7 @@
         select date_format(create_time, '%Y') year
         from t_blog
         group by year
+        order by year Desc
     </select>
 
     <select id="getBlogsViewByKeyword" resultMap="blogMap" parameterType="string">
