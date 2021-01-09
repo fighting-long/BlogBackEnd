@@ -2,8 +2,12 @@ package my.lxh.blog.handler;
 
 import my.lxh.blog.exception.BlogException;
 import my.lxh.blog.utils.ResultUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author lxh
@@ -12,9 +16,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class MyExceptionHandler {
 
+    private final Logger logger=LoggerFactory.getLogger(MyExceptionHandler.class);
+
     @ExceptionHandler(Exception.class)
-    public ResultUtil<?> test(Exception e){
-        e.printStackTrace();
+    public ResultUtil<?> test(HttpServletRequest request,Exception e){
+        logger.error("Request URL : {} , Exception : {}",request.getRequestURL(),e);
         return ResultUtil.error(e.getMessage());
     }
 
@@ -24,8 +30,8 @@ public class MyExceptionHandler {
      * @return
      */
     @ExceptionHandler(BlogException.class)
-    public ResultUtil<?> handleOperationException(BlogException e){
-        e.printStackTrace();
+    public ResultUtil<?> handleOperationException(HttpServletRequest request, BlogException e){
+        logger.error("Request URL : {} , Exception : {}",request.getRequestURL(),e);
         return ResultUtil.failure(e.getMessage());
     }
 

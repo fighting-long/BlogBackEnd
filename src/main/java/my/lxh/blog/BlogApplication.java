@@ -31,11 +31,11 @@ public class BlogApplication {
         if(path==null){
             path="";
         }
-        log.info("\n----------------------------------------------------------\n\t" +
+        log.info("\n---------------------------------------------------------------\n\t" +
                 "Local: \t\thttp://localhost:" + port + path + "/\n\t" +
                 "External: \thttp://" + ip + ":" + port + path + "/\n\t" +
-                "swagger-ui: \thttp://" + ip + ":" + port + path + "/swagger-ui.html\n\t" +
-                "----------------------------------------------------------");
+                "swagger-ui: \thttp://" + ip + ":" + port + path + "/swagger-ui.html\n" +
+                "---------------------------------------------------------------");
     }
 
 }
