@@ -80,7 +80,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> imp
         comment.setCreateTime(new Date())
                 .setChecked(false)
                 // 随机分配，和博主头像不一样  == 1~4 ==
-                .setAvatar("http://studywithu.cn/static/images/avatar/liuli_" + (new Random().nextInt(4) + 1) + ".jpg");
+                .setAvatar("http://studywithu.cn/statics/avatar/liuli_" + (new Random().nextInt(4) + 1) + ".jpg");
         // 判断博主 ， 设置一些默认值
         String content = comment.getContent();
         if (content.startsWith("<lxh>") && content.endsWith("</lxh>")) {
@@ -110,7 +110,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> imp
                 .setCreateTime(new Date())
                 .setEmail("lxh.ac@outlook.com")
                 //固定一个
-                .setAvatar("http://studywithu.cn/static/images/avatar/liuli_5.jpg");
+                .setAvatar("http://studywithu.cn/statics/avatar/liuli_5.jpg");
         return this.save(comment);
     }
 

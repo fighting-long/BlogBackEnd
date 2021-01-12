@@ -6,9 +6,13 @@ import io.swagger.annotations.ApiOperation;
 import my.lxh.blog.entity.User;
 import my.lxh.blog.entity.vo.PwdVo;
 import my.lxh.blog.service.IUserService;
+import my.lxh.blog.utils.JwtUtil;
 import my.lxh.blog.utils.ResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 
 /**
  * @author lxh
@@ -25,8 +29,10 @@ public class BackUserController {
 
     @GetMapping("/getUser")
     @ApiOperation("获取用户")
-    public ResultUtil<?> getUser(){
-        return ResultUtil.ok(userService.getMap(new QueryWrapper<User>().select("nickname")));
+    public ResultUtil<?> getUser(HttpServletRequest request){
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("nickname", JwtUtil.verify(request.getHeader("token")).getClaim("nickname").asString());
+        return ResultUtil.ok(map);
     }
 
     @GetMapping("/getUsername")

@@ -31,6 +31,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
         //获取token
         HashMap<String, Object> map = new HashMap<>();
+        map.put("nickname",admin.getNickname());
         //向token中加入数据，生成为期 n 天的token
         return JwtUtil.getToken(map,5);
     }

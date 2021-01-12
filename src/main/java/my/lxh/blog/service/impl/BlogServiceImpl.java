@@ -109,12 +109,14 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         Blog blog = baseMapper.selectById(id);
         blog.setType(typeMapper.selectById(blog.getTypeId()));
         List<BlogTags> blogTags = blogTagsMapper.selectList(new QueryWrapper<BlogTags>().lambda().eq(BlogTags::getBlogId, id));
-        List<Integer> temp= new ArrayList<>();
-        blogTags.forEach(blogTag -> temp.add(blogTag.getTagId()));
-        List<Tag> tags = tagMapper.selectBatchIds(temp);
-        List<String> list=new ArrayList<>();
-        tags.forEach(tag -> list.add(tag.getName()));
-        blog.setTagsName(list);
+        if(blogTags.size()!=0){
+            List<Integer> temp= new ArrayList<>();
+            blogTags.forEach(blogTag -> temp.add(blogTag.getTagId()));
+            List<Tag> tags = tagMapper.selectBatchIds(temp);
+            List<String> list=new ArrayList<>();
+            tags.forEach(tag -> list.add(tag.getName()));
+            blog.setTagsName(list);
+        }
         return blog;
     }
 
@@ -134,7 +136,9 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         List<Integer> copy=new ArrayList<>(list);
         //找出该博客现在应该有的标签id
         List<Integer> tagIds=new ArrayList<>();
-        blog.getTags().forEach(tag -> tagIds.add(tag.getId()));
+        if(Objects.nonNull(blog.getTags())){
+            blog.getTags().forEach(tag -> tagIds.add(tag.getId()));
+        }
         //找出中间表应该删除的数据，即以前有的，现在没有的
         list.removeAll(tagIds);
         list.forEach(id-> blogTagsMapper.delete(new QueryWrapper<BlogTags>().lambda()
