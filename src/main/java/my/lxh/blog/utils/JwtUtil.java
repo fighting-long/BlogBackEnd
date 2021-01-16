@@ -13,7 +13,7 @@ import java.util.Map;
  * @date 2020-12-09 21:08
  */
 public class JwtUtil {
-    public static final String SECRET="$JFKDN#$}@<S12";
+    public static final String SECRET="";
 
     /**
      * 传入要加到token中的信息，生成token并返回
