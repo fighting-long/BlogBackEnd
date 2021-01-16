@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import my.lxh.blog.enums.SecretEnum;
 
 import java.util.Calendar;
 import java.util.Map;
@@ -13,7 +14,8 @@ import java.util.Map;
  * @date 2020-12-09 21:08
  */
 public class JwtUtil {
-    public static final String SECRET="$JFKDN#$}@<S12";
+
+    public static final String SECRET= SecretEnum.JWTSECRET.getSecret();
 
     /**
      * 传入要加到token中的信息，生成token并返回

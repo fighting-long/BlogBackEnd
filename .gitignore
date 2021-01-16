@@ -36,3 +36,4 @@ build/
 /.mvn/
 /mvnw.cmd
 /mvnw
+/src/main/java/my/lxh/blog/enums/SecretEnum.java
