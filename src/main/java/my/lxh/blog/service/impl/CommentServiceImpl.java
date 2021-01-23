@@ -74,7 +74,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> imp
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean saveComment(Comment comment) {
         // 设置一些默认值
         comment.setCreateTime(new Date())
