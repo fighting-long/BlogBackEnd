@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiOperation;
 import my.lxh.blog.service.ITypeService;
 import my.lxh.blog.utils.ResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @Api(tags = "分类接口")
-@CrossOrigin
 public class TypeController {
 
     @Autowired

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @author lxh
  * @date 2021-01-04 22:26
  */
-@CrossOrigin
 @RestController
 @Api(tags = "信息接口")
 public class InfoController {

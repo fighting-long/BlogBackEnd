@@ -20,7 +20,6 @@ import java.util.List;
  */
 @RestController
 @Api(tags = "博客接口")
-@CrossOrigin
 public class BlogController {
 
     @Autowired

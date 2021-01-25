@@ -24,10 +24,6 @@ public class LoginInterceptor implements HandlerInterceptor {
         if("OPTIONS".equals(request.getMethod())){
             return true;
         }
-        //预检请求option，设置它的可以放置数据的格式
-        response.setHeader("Access-Control-Allow-Origin","*");
-        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH");
-        response.setHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept, Authorization");
         // 前台接口不需要保证安全？，后台管理接口需要
         String token = request.getHeader("token");
         if(Objects.isNull(token)){

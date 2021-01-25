@@ -31,7 +31,7 @@ public class CommentEndpoint {
     }
 
     /**
-     * 接收到客户端时的操作
+     * 接收到客户端消息时的操作
      * @param message
      * @param session
      */

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
  * @author lxh
  * @date 2020-12-29 14:53
  */
-@CrossOrigin
 @RestController
 @RequestMapping("/admin")
 @Api(tags = "后端标签接口")

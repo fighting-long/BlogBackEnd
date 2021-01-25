@@ -18,7 +18,6 @@ import java.util.HashMap;
  * @author lxh
  * @date 2020-12-28 21:28
  */
-@CrossOrigin
 @RestController
 @RequestMapping("/admin")
 @Api(tags = "后端用户接口")

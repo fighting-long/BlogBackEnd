@@ -63,7 +63,7 @@ public class LogAspect {
      */
     @AfterReturning(returning = "result",pointcut = "log()")
     public void doAfterReturning(Object result){
-        logger.info("Result : {}",result);
+        //logger.info("Result : {}",result);
     }
 
 

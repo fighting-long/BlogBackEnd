@@ -17,7 +17,6 @@ import java.io.IOException;
  * @author lxh
  * @date 2020-12-30 9:40
  */
-@CrossOrigin
 @RestController
 @Api(tags = "后台评论接口")
 @RequestMapping("/admin")
