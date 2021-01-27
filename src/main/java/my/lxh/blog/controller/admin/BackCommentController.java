@@ -89,13 +89,11 @@ public class BackCommentController {
     }
 
     private void notifyFront(){
-        CommentEndpoint.sessions.forEach(session -> {
-            try {
-                session.getBasicRemote().sendObject(true);
-            } catch (IOException | EncodeException e) {
-                e.printStackTrace();
-            }
-        });
+        try {
+            CommentEndpoint.userSession.getBasicRemote().sendObject(true);
+        } catch (IOException | EncodeException e) {
+            e.printStackTrace();
+        }
     }
 
 }

@@ -115,12 +115,10 @@ public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> imp
     }
 
     private void notifyFront() {
-        CommentEndpoint.sessions.forEach(session -> {
-            try {
-                session.getBasicRemote().sendObject(true);
-            } catch (IOException | EncodeException e) {
-                e.printStackTrace();
-            }
-        });
+        try {
+            CommentEndpoint.userSession.getBasicRemote().sendObject(true);
+        } catch (IOException | EncodeException e) {
+            e.printStackTrace();
+        }
     }
 }

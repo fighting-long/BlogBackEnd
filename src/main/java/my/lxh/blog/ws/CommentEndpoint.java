@@ -5,8 +5,7 @@ import org.springframework.stereotype.Component;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 /**
  * 思路：当登陆后台时建立连接，当有新评论时，发送信息到服务器，服务器发送信息给管理后台
@@ -18,7 +17,7 @@ import java.util.List;
 @ServerEndpoint("/comment")
 public class CommentEndpoint {
 
-    public static List<Session> sessions=new ArrayList<>();
+    public static Session userSession;
 
     /**
      * 建立连接时 的操作
@@ -27,7 +26,16 @@ public class CommentEndpoint {
      */
     @OnOpen
     public void onOpen(Session session, EndpointConfig config){
-        sessions.add(session);
+        synchronized (CommentEndpoint.class){
+            if(Objects.nonNull(userSession)){
+                try {
+                    userSession.getBasicRemote().sendObject(250);
+                } catch (IOException | EncodeException e) {
+                    e.printStackTrace();
+                }
+            }
+            userSession=session;
+        }
     }
 
     /**
@@ -37,6 +45,16 @@ public class CommentEndpoint {
      */
     @OnMessage
     public void onMessage(String message,Session session){
+        synchronized (CommentEndpoint.class) {
+            if ("reLogin".equals(message) && Objects.nonNull(userSession)) {
+                try {
+                    userSession.getBasicRemote().sendObject(250);
+                } catch (IOException | EncodeException e) {
+                    e.printStackTrace();
+                }
+            }
+            userSession=session;
+        }
     }
 
     /**
@@ -45,7 +63,7 @@ public class CommentEndpoint {
      */
     @OnClose
     public void onClose(Session session){
-        sessions.remove(session);
+        userSession=null;
         try {
             session.close();
         } catch (IOException e) {
