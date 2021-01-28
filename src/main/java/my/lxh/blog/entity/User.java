@@ -56,6 +56,9 @@ public class User {
     @TableField(exist = false)
     private List<Blog> blogs;
 
+    @ApiModelProperty("登陆方式")
+    @TableField(exist = false)
+    private String mode;
 
 
 }

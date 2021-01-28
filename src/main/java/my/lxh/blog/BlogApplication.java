@@ -6,6 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.EnableAsync;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.net.InetAddress;
@@ -19,6 +20,7 @@ import java.net.UnknownHostException;
 @EnableSwagger2
 @MapperScan(basePackages = "my.lxh.blog.mapper")
 @Log4j2
+@EnableAsync
 public class BlogApplication {
 
     public static void main(String[] args) throws UnknownHostException {

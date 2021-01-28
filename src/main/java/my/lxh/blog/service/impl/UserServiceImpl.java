@@ -7,7 +7,13 @@ import my.lxh.blog.entity.vo.PwdVo;
 import my.lxh.blog.exception.BlogException;
 import my.lxh.blog.mapper.UserMapper;
 import my.lxh.blog.service.IUserService;
+import my.lxh.blog.utils.CodeUtil;
 import my.lxh.blog.utils.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -20,6 +26,12 @@ import java.util.Objects;
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService{
 
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private JavaMailSender mailSender;
 
     @Override
     public String loginBack(User user) {
@@ -34,6 +46,34 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         map.put("nickname",admin.getNickname());
         //向token中加入数据，生成为期 n 天的token
         return JwtUtil.getToken(map,5);
+    }
+
+    @Override
+    public String loginBackByCode(User user) {
+        User admin = baseMapper.selectById(1);
+        String code = stringRedisTemplate.opsForValue().get(user.getUsername());
+        if(!user.getPassword().equals(code)){
+            throw new BlogException("验证码错误！");
+        }else if(!admin.getUsername().equals(user.getEmail())){
+            throw new BlogException("还不支持游客登陆。");
+        }
+        //获取token
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("nickname",admin.getNickname());
+        //向token中加入数据，生成为期 n 天的token
+        return JwtUtil.getToken(map,5);
+    }
+
+    @Async
+    @Override
+    public void sendCode(String username) {
+        SimpleMailMessage simpleMessage = new SimpleMailMessage();
+        String code = CodeUtil.getCode();
+        simpleMessage.setText("邮箱验证码为："+code);
+        simpleMessage.setFrom("343932572@qq.com");
+        simpleMessage.setTo(username);
+        mailSender.send(simpleMessage);
+        stringRedisTemplate.opsForValue().set("username",code);
     }
 
     @Override

@@ -22,4 +22,17 @@ public interface IUserService extends IService<User> {
      * @return
      */
     boolean updatePwd(PwdVo pwdVo);
+
+    /**
+     * 登陆后台接口
+     * @param user
+     * @return
+     */
+    String loginBackByCode(User user);
+
+    /**
+     * 发送验证码
+     * @param username
+     */
+    void sendCode(String username);
 }
