@@ -1,7 +1,7 @@
 package my.lxh.blog.controller;
 
 import io.swagger.annotations.Api;
-import my.lxh.blog.entity.User;
+import my.lxh.blog.entity.vo.LoginVo;
 import my.lxh.blog.service.IUserService;
 import my.lxh.blog.utils.ResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +22,8 @@ public class UserController {
     private IUserService userService;
 
     @PostMapping("/login")
-    public ResultUtil<?> login(@RequestBody User user){
-        return ResultUtil.ok("密码".equals(user.getMode())?userService.loginBack(user):userService.loginBackByCode(user));
+    public ResultUtil<?> login(@RequestBody LoginVo loginVo){
+        return ResultUtil.ok("密码".equals(loginVo.getMode())?userService.loginBack(loginVo):userService.loginBackByCode(loginVo));
     }
 
     /**
@@ -31,8 +31,8 @@ public class UserController {
      * @return
      */
     @GetMapping("/sendCode")
-    public ResultUtil<?> sendCode(String username){
-        userService.sendCode(username);
+    public ResultUtil<?> sendCode(String user){
+        userService.sendCode(user);
         return ResultUtil.ok();
     }
 }

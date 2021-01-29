@@ -37,6 +37,9 @@ public class User {
     @ApiModelProperty("密码")
     private String password;
 
+    @ApiModelProperty("盐")
+    private String salt;
+
     @ApiModelProperty("邮箱")
     private String email;
 
@@ -55,10 +58,5 @@ public class User {
     @ApiModelProperty("此用户的博客列表")
     @TableField(exist = false)
     private List<Blog> blogs;
-
-    @ApiModelProperty("登陆方式")
-    @TableField(exist = false)
-    private String mode;
-
 
 }

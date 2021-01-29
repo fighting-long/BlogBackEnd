@@ -2,6 +2,7 @@ package my.lxh.blog.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import my.lxh.blog.entity.User;
+import my.lxh.blog.entity.vo.LoginVo;
 import my.lxh.blog.entity.vo.PwdVo;
 
 /**
@@ -11,10 +12,10 @@ import my.lxh.blog.entity.vo.PwdVo;
 public interface IUserService extends IService<User> {
     /**
      * 登陆后台接口
-     * @param user
+     * @param loginVo
      * @return
      */
-    String loginBack(User user);
+    String loginBack(LoginVo loginVo);
 
     /**
      * 更新密码
@@ -25,14 +26,14 @@ public interface IUserService extends IService<User> {
 
     /**
      * 登陆后台接口
-     * @param user
+     * @param loginVo
      * @return
      */
-    String loginBackByCode(User user);
+    String loginBackByCode(LoginVo loginVo);
 
     /**
      * 发送验证码
-     * @param username
+     * @param user
      */
-    void sendCode(String username);
+    void sendCode(String user);
 }

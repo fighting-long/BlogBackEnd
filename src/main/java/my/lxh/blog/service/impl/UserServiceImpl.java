@@ -3,12 +3,14 @@ package my.lxh.blog.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import my.lxh.blog.entity.User;
+import my.lxh.blog.entity.vo.LoginVo;
 import my.lxh.blog.entity.vo.PwdVo;
 import my.lxh.blog.exception.BlogException;
 import my.lxh.blog.mapper.UserMapper;
 import my.lxh.blog.service.IUserService;
 import my.lxh.blog.utils.CodeUtil;
 import my.lxh.blog.utils.JwtUtil;
+import org.apache.commons.codec.digest.Md5Crypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author lxh
@@ -34,11 +37,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private JavaMailSender mailSender;
 
     @Override
-    public String loginBack(User user) {
+    public String loginBack(LoginVo loginVo) {
         User admin = baseMapper.selectOne(new QueryWrapper<User>().lambda()
-                .eq(User::getUsername, user.getUsername())
-                .eq(User::getPassword, user.getPassword()));
-        if(Objects.isNull(admin)){
+                .eq(User::getUsername, loginVo.getUser()));
+        if(Objects.isNull(admin) || !admin.getPassword().equals(Md5Crypt.apr1Crypt(loginVo.getSecret(),admin.getSalt()))){
             throw new BlogException("用户名或密码错误！");
         }
         //获取token
@@ -49,12 +51,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public String loginBackByCode(User user) {
+    public String loginBackByCode(LoginVo loginVo) {
         User admin = baseMapper.selectById(1);
-        String code = stringRedisTemplate.opsForValue().get(user.getUsername());
-        if(!user.getPassword().equals(code)){
+        String code = stringRedisTemplate.opsForValue().get(loginVo.getUser());
+        if(!loginVo.getSecret().equalsIgnoreCase(code)){
             throw new BlogException("验证码错误！");
-        }else if(!admin.getUsername().equals(user.getEmail())){
+        }else if(!admin.getEmail().equals(loginVo.getUser())){
             throw new BlogException("还不支持游客登陆。");
         }
         //获取token
@@ -66,26 +68,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Async
     @Override
-    public void sendCode(String username) {
+    public void sendCode(String user) {
         SimpleMailMessage simpleMessage = new SimpleMailMessage();
-        String code = CodeUtil.getCode();
+        String code = CodeUtil.getCode(6);
         simpleMessage.setText("邮箱验证码为："+code);
         simpleMessage.setFrom("343932572@qq.com");
-        simpleMessage.setTo(username);
+        simpleMessage.setTo(user);
         mailSender.send(simpleMessage);
-        stringRedisTemplate.opsForValue().set("username",code);
+        stringRedisTemplate.opsForValue().set(user,code,5, TimeUnit.MINUTES);
     }
 
     @Override
     public boolean updatePwd(PwdVo pwdVo) {
         User byId = this.getById(1);
-        if(!byId.getPassword().equals(pwdVo.getOldPwd())){
+        if(!byId.getPassword().equals(Md5Crypt.apr1Crypt(pwdVo.getOldPwd(),byId.getSalt()))){
             throw new BlogException("旧密码错误");
         }
         User user = new User();
+        String salt = CodeUtil.getCode(8);
         user.setId(byId.getId())
                 .setUsername(pwdVo.getUsername())
-                .setPassword(pwdVo.getNewPwd());
+                .setPassword(Md5Crypt.apr1Crypt(pwdVo.getNewPwd(),salt))
+                .setSalt(salt);
         return this.updateById(user);
     }
 
