@@ -6,6 +6,7 @@ import my.lxh.blog.entity.Comment;
 import my.lxh.blog.mapper.CommentsMapper;
 import my.lxh.blog.service.ICommentService;
 import my.lxh.blog.ws.CommentEndpoint;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import java.util.*;
  * @date 2020-12-26 11:16
  */
 @Service
+@Scope("prototype")
 public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> implements ICommentService {
 
     private final List<Comment> comments = new ArrayList<>();
@@ -28,36 +30,36 @@ public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> imp
                 .eq("blog_id", id)
                 .orderByDesc("admin")
                 .orderByDesc("create_time"));
-        List<Comment> parent = new ArrayList<>();
-        List<Comment> child = new ArrayList<>();
+        List<Comment> parents = new ArrayList<>();
+        List<Comment> childes = new ArrayList<>();
         all.forEach(comment -> {
             if (Objects.isNull(comment.getParentCommentId())) {
-                parent.add(comment);
+                parents.add(comment);
             } else {
-                child.add(comment);
+                childes.add(comment);
             }
         });
         // 对评论进行合并
-        for (Comment c : parent) {
-            mergeComment(child, c);
-            c.setReplyComments(new ArrayList<>(this.comments));
+        for (Comment parent : parents) {
+            mergeComment(childes, parent);
+            parent.setReplyComments(new ArrayList<>(this.comments));
             this.comments.clear();
         }
-        return parent;
+        return parents;
     }
 
     /**
      * 对每级评论进行合并
      *
      * @param child
-     * @param comment
+     * @param parent
      */
-    private void mergeComment(List<Comment> child, Comment comment) {
+    private void mergeComment(List<Comment> child, Comment parent) {
         List<Comment> temp = new ArrayList<>();
         for (Comment c : child) {
-            if (comment.getId().compareTo(c.getParentCommentId()) == 0) {
+            if (parent.getId().compareTo(c.getParentCommentId()) == 0) {
                 try {
-                    c.setParentComment((Comment) comment.clone());
+                    c.setParentComment((Comment) parent.clone());
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                 }
@@ -67,8 +69,8 @@ public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> imp
         if (temp.size() == 0) {
             return;
         }
-        for (Comment c : temp) {
-            mergeComment(child, c);
+        for (Comment p : temp) {
+            mergeComment(child, p);
         }
         comments.addAll(temp);
     }
