@@ -3,6 +3,7 @@ package my.lxh.blog.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import my.lxh.blog.entity.User;
+import my.lxh.blog.entity.vo.InfoVo;
 import my.lxh.blog.entity.vo.LoginVo;
 import my.lxh.blog.entity.vo.PwdVo;
 import my.lxh.blog.exception.BlogException;
@@ -68,14 +69,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Async
     @Override
-    public void sendCode(String user) {
+    public void sendCode(String email) {
         SimpleMailMessage simpleMessage = new SimpleMailMessage();
         String code = CodeUtil.getCode(6);
         simpleMessage.setText("邮箱验证码为："+code);
         simpleMessage.setFrom("343932572@qq.com");
-        simpleMessage.setTo(user);
+        simpleMessage.setTo(email);
         mailSender.send(simpleMessage);
-        stringRedisTemplate.opsForValue().set(user,code,5, TimeUnit.MINUTES);
+        stringRedisTemplate.opsForValue().set(email,code,5, TimeUnit.MINUTES);
     }
 
     @Override
@@ -91,6 +92,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 .setPassword(Md5Crypt.apr1Crypt(pwdVo.getNewPwd(),salt))
                 .setSalt(salt);
         return this.updateById(user);
+    }
+
+    @Override
+    public InfoVo getAdminInfo() {
+        User user = baseMapper.selectById(1);
+        return new InfoVo(user);
+    }
+
+    @Override
+    public Boolean updateInfo(InfoVo infoVo) {
+        User userDb = new User(infoVo);
+        return baseMapper.updateById(userDb)>0;
     }
 
 }

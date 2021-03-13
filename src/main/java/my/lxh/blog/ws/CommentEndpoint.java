@@ -21,6 +21,7 @@ public class CommentEndpoint {
 
     /**
      * 建立连接时 的操作
+     * 如果不是null，给前端发送信息，说明现在有其他连接上来了
      * @param session
      * @param config
      */

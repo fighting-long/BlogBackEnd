@@ -27,9 +27,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> imp
     @Override
     public List<Comment> getComments(Long id) {
         List<Comment> all = baseMapper.selectList(new QueryWrapper<Comment>()
-                .eq("blog_id", id)
-                .orderByDesc("admin")
-                .orderByDesc("create_time"));
+                .eq("blog_id", id));
         List<Comment> parents = new ArrayList<>();
         List<Comment> childes = new ArrayList<>();
         all.forEach(comment -> {
@@ -42,15 +40,16 @@ public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> imp
         // 对评论进行合并
         for (Comment parent : parents) {
             mergeComment(childes, parent);
+            Collections.sort(comments);
             parent.setReplyComments(new ArrayList<>(this.comments));
             this.comments.clear();
         }
+        Collections.sort(parents);
         return parents;
     }
 
     /**
      * 对每级评论进行合并
-     *
      * @param child
      * @param parent
      */
@@ -79,17 +78,19 @@ public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> imp
     @Transactional(rollbackFor = Exception.class)
     public boolean saveComment(Comment comment) {
         // 设置一些默认值
-        comment.setCreateTime(new Date())
-                .setChecked(false)
-                // 随机分配，和博主头像不一样  == 1~4 ==
-                .setAvatar("http://studywithu.cn/statics/avatar/liuli_" + (new Random().nextInt(4) + 1) + ".jpg");
+        comment.setCreateTime(new Date());
         // 判断博主 ， 设置一些默认值
         String content = comment.getContent();
         if (content.startsWith("<lxh>") && content.endsWith("</lxh>")) {
             comment.setContent(content.substring(5, content.length() - 6))
                     .setAdmin(true)
                     .setChecked(true)
-                    .setNickname("博主");
+                    .setNickname("博主")
+                    .setAvatar("http://studywithu.cn/statics/avatar/liuli_5.jpg");
+        }else {
+            comment.setChecked(false)
+                    // 随机分配，和博主头像不一样  == 1~4 ==
+                    .setAvatar("http://studywithu.cn/statics/avatar/liuli_" + (new Random().nextInt(4) + 1) + ".jpg");
         }
         boolean save = this.save(comment);
         //评论成功并且不是博主 才向前端发送数据

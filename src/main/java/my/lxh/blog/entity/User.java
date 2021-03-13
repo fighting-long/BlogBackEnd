@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import my.lxh.blog.entity.vo.InfoVo;
 
 import java.util.Date;
 import java.util.List;
@@ -58,5 +59,32 @@ public class User {
     @ApiModelProperty("此用户的博客列表")
     @TableField(exist = false)
     private List<Blog> blogs;
+
+    @ApiModelProperty("首图")
+    private String picture;
+
+    @ApiModelProperty("描述")
+    private String myDescription;
+
+    @ApiModelProperty("个人标签")
+    private String userTag;
+
+    @ApiModelProperty("技术标签")
+    private String techTag;
+
+    public User(InfoVo infoVo){
+        this.id=infoVo.getId();
+        this.picture=infoVo.getInfoPicture();
+        this.myDescription=infoVo.getInfoDescription();
+        StringBuilder sb=new StringBuilder();
+        infoVo.getUserTag().forEach(s->sb.append(s).append(","));
+        this.userTag=sb.toString();
+        StringBuilder sb1=new StringBuilder();
+        infoVo.getTechTag().forEach(s->sb1.append(s).append(","));
+        this.techTag=sb1.toString();
+        this.nickname=infoVo.getNickname();
+        this.avatar=infoVo.getAvatar();
+        this.email=infoVo.getEmail();
+    }
 
 }

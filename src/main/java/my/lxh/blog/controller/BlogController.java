@@ -39,7 +39,7 @@ public class BlogController {
     }
 
     /**
-     * 概览 ： 主页分页查询博客 及其 分类
+     * 概览 ： 主页分页用关键字查询博客 及其 分类
      * @param startPage
      * @param size
      * @return
@@ -48,7 +48,7 @@ public class BlogController {
     @ApiOperation("概览 ： 主页分页用关键字查询博客 及其 分类")
     public ResultUtil<?> getAllBySearch(@PathVariable Integer startPage,
                                         @PathVariable Integer size,
-                                        @RequestParam(required = false) String keyword){
+                                        @RequestParam String keyword){
         return ResultUtil.ok(blogService.getBlogsViewBySearch(startPage, size,keyword));
     }
 

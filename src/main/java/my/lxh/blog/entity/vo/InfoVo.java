@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import my.lxh.blog.entity.Config;
+import my.lxh.blog.entity.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,12 +28,15 @@ public class InfoVo {
     private String email;
     private String avatar;
 
-    public InfoVo(Config config){
-        this.id=config.getId();
-        this.infoPicture=config.getPicture();
-        this.infoDescription=config.getMyDescription();
-        this.userTag=new ArrayList<>(List.of(config.getUserTag().substring(0,config.getUserTag().length()-1).split(",")));
-        this.techTag=new ArrayList<>(List.of(config.getTechTag().substring(0,config.getTechTag().length()-1).split(",")));
+    public InfoVo(User user){
+        this.id= user.getId();
+        this.infoPicture= user.getPicture();
+        this.infoDescription= user.getMyDescription();
+        this.userTag=new ArrayList<>(List.of(user.getUserTag().substring(0, user.getUserTag().length()-1).split(",")));
+        this.techTag=new ArrayList<>(List.of(user.getTechTag().substring(0, user.getTechTag().length()-1).split(",")));
+        this.avatar=user.getAvatar();
+        this.nickname=user.getNickname();
+        this.email=user.getEmail();
     }
 
 }

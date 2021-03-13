@@ -69,7 +69,6 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
     }
 
     @Override
-    @Transactional
     public Blog getBlogDetailById(Integer id) {
         Blog blog = baseMapper.getBlogDetail(id);
         blog.setViews(blog.getViews()+1);
@@ -87,6 +86,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean saveBlog(Blog blog) {
         blog.setViews(0)
                 .setCreateTime(new Date())
@@ -121,6 +121,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean updateBlog(Blog blog){
         blog.setUpdateTime(new Date());
         //保存分类 和 分类id
@@ -147,7 +148,6 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         //找出中间表应该插入的数据，即以前没有的，现在有的
         tagIds.removeAll(copy);
         tagIds.forEach(id-> blogTagsMapper.insert(new BlogTags().setBlogId(blog.getId()).setTagId(id)));
-
         //更新博客
         baseMapper.updateById(blog);
         return true;
@@ -157,7 +157,8 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
      * 对不存在的标签进行保存
      * @param blog
      */
-    private void settingTags(Blog blog) {
+    @Transactional(rollbackFor = Exception.class)
+    public void settingTags(Blog blog) {
         ArrayList<Tag> tags = new ArrayList<>();
         blog.getTagsName().forEach(name->{
             Tag tag = tagMapper.selectOne(new QueryWrapper<Tag>().lambda()
@@ -175,7 +176,8 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
     /**
      * 将分类id设置进blog
      */
-    private void settingType(Blog blog){
+    @Transactional(rollbackFor = Exception.class)
+    public void settingType(Blog blog){
         //先查一次这个type是否存在于数据库中
         Type type = typeMapper.selectOne(new QueryWrapper<Type>().lambda()
                 .select(Type::getId)
