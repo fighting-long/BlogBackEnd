@@ -119,7 +119,9 @@ public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> imp
 
     private void notifyFront() {
         try {
-            CommentEndpoint.userSession.getBasicRemote().sendObject(true);
+            if(Objects.nonNull(CommentEndpoint.userSession)){
+                CommentEndpoint.userSession.getBasicRemote().sendObject(true);
+            }
         } catch (IOException | EncodeException e) {
             e.printStackTrace();
         }

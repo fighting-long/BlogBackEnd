@@ -149,8 +149,15 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         tagIds.removeAll(copy);
         tagIds.forEach(id-> blogTagsMapper.insert(new BlogTags().setBlogId(blog.getId()).setTagId(id)));
         //更新博客
-        baseMapper.updateById(blog);
-        return true;
+        return  baseMapper.updateById(blog)>0;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean deleteBlogById(Long id) {
+        blogTagsMapper.delete(new QueryWrapper<BlogTags>().lambda().eq(BlogTags::getBlogId, id));
+        int dBlog = baseMapper.deleteById(id);
+        return dBlog>0;
     }
 
     /**

@@ -79,4 +79,11 @@ public interface IBlogService extends IService<Blog> {
      * @return
      */
     Boolean updateBlog(Blog blog);
+
+    /**
+     * 删除博客
+     * @param id
+     * @return
+     */
+    boolean deleteBlogById(Long id);
 }

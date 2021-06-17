@@ -29,8 +29,7 @@ public class BackBlogController {
     @DeleteMapping("/delBlog/{id}")
     @ApiOperation("删除博客")
     public ResultUtil<?> delBlog(@PathVariable Long id){
-        System.out.println("删除成功==》"+id);
-        return blogService.removeById(id)?ResultUtil.ok():ResultUtil.error();
+        return blogService.deleteBlogById(id)?ResultUtil.ok():ResultUtil.error();
     }
 
     @PostMapping("/saveBlog")

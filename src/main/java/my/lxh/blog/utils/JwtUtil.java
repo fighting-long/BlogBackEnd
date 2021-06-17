@@ -15,6 +15,7 @@ import java.util.Map;
  */
 public class JwtUtil {
 
+    // 这里的SECRET可以是随便的字符串，我就不给出来了
     public static final String SECRET= SecretEnum.JWTSECRET.getSecret();
 
     /**

@@ -31,7 +31,7 @@ public class CommentController {
     }
 
     @PostMapping("/saveComment")
-    @ApiOperation("保存博客")
+    @ApiOperation("保存评论")
     public ResultUtil<?> saveComment(@RequestBody Comment comment){
         return commentService.saveComment(comment)?ResultUtil.ok():ResultUtil.error();
     }

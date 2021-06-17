@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.EncodeException;
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * @author lxh
@@ -90,7 +91,9 @@ public class BackCommentController {
 
     private void notifyFront(){
         try {
-            CommentEndpoint.userSession.getBasicRemote().sendObject(true);
+            if(Objects.nonNull(CommentEndpoint.userSession)){
+                CommentEndpoint.userSession.getBasicRemote().sendObject(true);
+            }
         } catch (IOException | EncodeException e) {
             e.printStackTrace();
         }
