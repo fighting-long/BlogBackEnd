@@ -1,6 +1,7 @@
 package my.lxh.blog.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import my.lxh.blog.entity.vo.LoginVo;
 import my.lxh.blog.service.IUserService;
 import my.lxh.blog.utils.ResultUtil;
@@ -31,8 +32,15 @@ public class UserController {
      * @return
      */
     @GetMapping("/sendCode")
-    public ResultUtil<?> sendCode(String user){
-        userService.sendCode(user);
+    public ResultUtil<?> sendCode(String email){
+        userService.sendCode(email);
         return ResultUtil.ok();
     }
+
+    @GetMapping("/getInfo")
+    @ApiOperation("得到博主信息")
+    public ResultUtil<?> getInfo(){
+        return ResultUtil.ok(userService.getAdminInfo());
+    }
+
 }

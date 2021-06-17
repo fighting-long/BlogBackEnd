@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import my.lxh.blog.entity.User;
+import my.lxh.blog.entity.vo.InfoVo;
 import my.lxh.blog.entity.vo.PwdVo;
 import my.lxh.blog.service.IUserService;
 import my.lxh.blog.utils.JwtUtil;
@@ -46,5 +47,10 @@ public class BackUserController {
         return userService.updatePwd(pwdVo)?ResultUtil.ok():ResultUtil.error();
     }
 
+    @PutMapping("/updateInfo")
+    @ApiOperation("更新博主信息")
+    public ResultUtil<?> updateInfo(@RequestBody InfoVo infoVo){
+        return ResultUtil.ok(userService.updateInfo(infoVo));
+    }
 
 }

@@ -21,7 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class Comment implements Cloneable{
+public class Comment implements Cloneable,Comparable<Comment>{
 
     @TableId
     @ApiModelProperty("主键")
@@ -69,5 +69,10 @@ public class Comment implements Cloneable{
     @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
+    }
+
+    @Override
+    public int compareTo(Comment o) {
+        return this.createTime.compareTo(o.createTime);
     }
 }

@@ -2,6 +2,7 @@ package my.lxh.blog.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import my.lxh.blog.entity.User;
+import my.lxh.blog.entity.vo.InfoVo;
 import my.lxh.blog.entity.vo.LoginVo;
 import my.lxh.blog.entity.vo.PwdVo;
 
@@ -33,7 +34,21 @@ public interface IUserService extends IService<User> {
 
     /**
      * 发送验证码
-     * @param user
+     * @param email
      */
-    void sendCode(String user);
+    void sendCode(String email);
+
+
+    /**
+     * 获取博主信息
+     * @return
+     */
+    InfoVo getAdminInfo();
+
+    /**
+     * 更新信息
+     * @param infoVo
+     * @return
+     */
+    Boolean updateInfo(InfoVo infoVo);
 }
