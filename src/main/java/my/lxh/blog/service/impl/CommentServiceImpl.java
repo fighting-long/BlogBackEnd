@@ -6,13 +6,18 @@ import my.lxh.blog.entity.Comment;
 import my.lxh.blog.mapper.CommentsMapper;
 import my.lxh.blog.service.ICommentService;
 import my.lxh.blog.ws.CommentEndpoint;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.websocket.EncodeException;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author lxh
@@ -22,7 +27,12 @@ import java.util.*;
 @Scope("prototype")
 public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> implements ICommentService {
 
+    @Autowired
+    private JavaMailSender mailSender;
+
     private final List<Comment> comments = new ArrayList<>();
+
+    private final ExecutorService executor = Executors.newFixedThreadPool(5);
 
     @Override
     public List<Comment> getComments(Long id) {
@@ -50,6 +60,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> imp
 
     /**
      * 对每级评论进行合并
+     *
      * @param child
      * @param parent
      */
@@ -87,7 +98,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> imp
                     .setChecked(true)
                     .setNickname("博主")
                     .setAvatar("http://studywithu.cn/statics/avatar/liuli_5.jpg");
-        }else {
+        } else {
             comment.setChecked(false)
                     // 随机分配，和博主头像不一样  == 1~4 ==
                     .setAvatar("http://studywithu.cn/statics/avatar/liuli_" + (new Random().nextInt(4) + 1) + ".jpg");
@@ -95,7 +106,10 @@ public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> imp
         boolean save = this.save(comment);
         //评论成功并且不是博主 才向前端发送数据
         if (save && Objects.isNull(comment.getAdmin())) {
-            notifyFront();
+            executor.execute(() -> {
+                notifyFront();
+                sendCommentByEmail(comment);
+            });
         }
         return save;
     }
@@ -119,11 +133,24 @@ public class CommentServiceImpl extends ServiceImpl<CommentsMapper, Comment> imp
 
     private void notifyFront() {
         try {
-            if(Objects.nonNull(CommentEndpoint.userSession)){
+            if (Objects.nonNull(CommentEndpoint.userSession)) {
                 CommentEndpoint.userSession.getBasicRemote().sendObject(true);
             }
         } catch (IOException | EncodeException e) {
             e.printStackTrace();
         }
+    }
+
+    public void sendCommentByEmail(Comment comment) {
+        SimpleMailMessage simpleMessage = new SimpleMailMessage();
+        simpleMessage.setSubject("新评论");
+        simpleMessage.setText(String.format("评论者：%s\n评论者邮箱：%s\n评论内容：%s\n博客内容：%s",
+                comment.getNickname(),
+                comment.getEmail(),
+                comment.getContent(),
+                "http://studywithu.cn/#/blogDetail/"+comment.getBlogId()));
+        simpleMessage.setFrom("343932572@qq.com");
+        simpleMessage.setTo("lxh.ac@outlook.com");
+        mailSender.send(simpleMessage);
     }
 }

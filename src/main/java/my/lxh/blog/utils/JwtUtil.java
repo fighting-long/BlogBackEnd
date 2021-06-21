@@ -16,7 +16,7 @@ import java.util.Map;
 public class JwtUtil {
 
     // 这里的SECRET可以是随便的字符串，我就不给出来了
-    public static final String SECRET= SecretEnum.JWTSECRET.getSecret();
+    public static final String SECRET = SecretEnum.JWTSECRET.getSecret();
 
     /**
      * 传入要加到token中的信息，生成token并返回
